@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response, static as assets } from "express";
 import { Container, inject, injectable } from "inversify";
 import { InversifyExpressServer, interfaces } from "inversify-express-utils";
 import { engine } from "express-handlebars";
@@ -29,6 +29,8 @@ server.setConfig((app) => {
 
   app.set("view engine", ".hbs");
   app.set("views", __dirname + "/views");
+
+  app.use("/assets", assets(__dirname + "/views/assets"));
 })
 
 let app = server.build();

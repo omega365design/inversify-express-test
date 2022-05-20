@@ -11,7 +11,24 @@ class HandlebarsGenerator implements TemplateGenerator {
           reject(err);
           return;
         }
-        
+
+        resolve(html);
+      })
+    );
+
+    return html;
+  }
+
+  public async getHtmlWithLayout(name: string, layout: string): Promise<string> {
+    let html = await new Promise<string>((resolve, reject) =>
+      app.render(name, {
+        layout: layout
+      }, (err: any, html: string) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
         resolve(html);
       })
     );
