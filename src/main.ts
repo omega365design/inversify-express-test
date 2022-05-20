@@ -1,23 +1,36 @@
 import "reflect-metadata";
-import { Container } from "inversify";
-import { InversifyExpressServer } from "inversify-express-utils";
-import { InvoiceService } from "./services/InvoiceService";
-import { Connection } from "mysql2";
+import { NextFunction, Request, Response } from "express";
+import { Container, inject, injectable } from "inversify";
+import { InversifyExpressServer, interfaces } from "inversify-express-utils";
+import { engine } from "express-handlebars";
 
 // Controllers/Routes
-import "./controllers/HomeController";
-import "./controllers/InvoiceController";
-import { InvoiceRepository } from "./types";
+import "./controllers";
 
-// DB setup
-import connection from "./db-setup";
+// IOC types
+import { TemplateGenerator } from "./types";
+
+// Services
+import HandlebarsGenerator from "./services/HandlebarsGenerator";
 
 // IOC
 let container = new Container();
-container.bind<InvoiceRepository>("InvoiceRepository").to(InvoiceService);
 
-let server = new InversifyExpressServer(container);
+container.bind<TemplateGenerator>("TemplateGenerator").to(HandlebarsGenerator);
+
+let server = new InversifyExpressServer(
+  container
+);
+
+server.setConfig((app) => {
+  app.engine("handlebars", engine());
+
+  app.set("view engine", "handlebars");
+  app.set("views", __dirname + "/views");
+})
 
 let app = server.build();
 
 app.listen(3000, () => console.log('Server started...'));
+
+export default app;

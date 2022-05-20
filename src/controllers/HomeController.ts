@@ -1,14 +1,22 @@
+import { Response, Request } from "express";
 import { inject } from "inversify";
-import { interfaces, httpGet, controller, queryParam, requestParam } from "inversify-express-utils";
-import { InvoiceRepository } from "../types";
+import { interfaces, httpGet, controller, queryParam, requestParam, request, response } from "inversify-express-utils";
+import { TemplateGenerator } from "../types";
 
 @controller('/')
 class HomeController implements interfaces.Controller {
-  @inject('InvoiceRepository') private readonly _ir: InvoiceRepository;
-
+  @inject('TemplateGenerator') private readonly _templateGenerator: TemplateGenerator;
+  
   @httpGet('/')
   private async index() {
-    return "Hello!"
+    try {
+      let html = await this._templateGenerator.getHtml('home');
+      return html;
+    } catch (err) {
+      return {
+        error: "Something went wrong.."
+      }
+    }
   }
 }
 
